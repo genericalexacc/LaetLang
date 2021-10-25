@@ -6,18 +6,18 @@ This is a toy language that was meant as a learning exercise, please do not use 
 A few of the things that I decided to add that were not part of the interpreter covered in the book:
 
 
-Reading from a file:
+## Reading from a file:
 ```javascript
 var textInput = fileR("./out.txt");
 print "File content is: " + textInput;
 ```
 
-Writting to files:
+## Writting to files:
 ```javascript
 fileln("./out.txt", "Hello World.");
 ```
 
-Making a network call:
+## Making a network call:
 ```javascript
 var networkResponse = net("localhost", 2000, "TEST");
 print "Server responded with: " + networkResponse;
@@ -30,7 +30,7 @@ The network call is a TCP write, so a language level library for http calls coul
 
 Other things in the language that are straight from the book implementation of the interpreter:
 
-Defining a function:
+## Defining a function:
 ```javascript
 fun fib(n) {
     if (n <= 1) return n;
@@ -38,7 +38,7 @@ fun fib(n) {
 }
 ```
 
-FizzBuzz is messy because of no elif :(
+## FizzBuzz is messy because of no elif :(
 ```javascript
 fun mod1(a, m, i) {
     if (m * i == a) {
