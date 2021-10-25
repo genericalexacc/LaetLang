@@ -38,7 +38,7 @@ fun fib(n) {
 }
 ```
 
-FizzBuzz is messy because of no elif :(:
+FizzBuzz is messy because of no elif :(
 ```javascript
 fun mod1(a, m, i) {
     if (m * i == a) {
