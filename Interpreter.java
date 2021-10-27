@@ -5,17 +5,20 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     final Environment globals = new Environment();
+
+    final ConcurrentHashMap<String, Object> EventDict;
+
     private Environment environment = globals;
     private final Map<Expr, Integer> locals = new HashMap<>();
 
     Interpreter() {
+        EventDict = new ConcurrentHashMap<>();
+
         globals.define("time", new LaetCallable() {
             @Override
             public int arity() {
@@ -100,10 +103,87 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                     out.println((String)args.get(2));
                     response = in.readLine();
                 } catch (IOException e) {
-                    System.out.println(e);
                     return "";
                 }
                 return response;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("asyncNet", new LaetCallable() {
+            class AsyncNetThread implements Runnable {
+                final ConcurrentHashMap<String, Object> eventDict;
+                final List<Object> args;
+                final String eventDictUUID;
+                AsyncNetThread(ConcurrentHashMap<String, Object> eventDict, List<Object> args) {
+                    this.eventDict = eventDict;
+                    this.args = args;
+                    this.eventDictUUID = UUID.randomUUID().toString();
+                }
+
+                public void run() {
+                    String url = (String) args.get(0);
+                    int port_no = ((Double) args.get(1)).intValue();
+                    String response = "";
+                    synchronized (this) {
+                        try {
+                            while(response == null || response.equals("")) {
+                                Socket echoSocket = new Socket(url, port_no);
+                                PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
+                                BufferedReader in =  new BufferedReader(  new InputStreamReader(echoSocket.getInputStream()));
+                                out.println((String)args.get(2));
+                                response = in.readLine();
+                                echoSocket.close();
+                                if(response != null) {
+                                    eventDict.put(this.eventDictUUID, response);
+                                    return;
+                                }
+                            }
+                        } catch (Exception e) {
+                            eventDict.put(this.eventDictUUID, false);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public int arity() {
+                return 3;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> args) {
+                AsyncNetThread ant = new AsyncNetThread(interpreter.EventDict, args);
+                ant.run();
+                return ant.eventDictUUID;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("PromiseResolve", new LaetCallable() {
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> args) {
+                Object result = null;
+                while (result == null) {
+                    Thread.yield();
+                    result = interpreter.EventDict.get((String) args.get(0));
+                }
+
+
+                return interpreter.EventDict.get((String) args.get(0));
             }
 
             @Override
