@@ -29,8 +29,8 @@ The network call is a TCP write, so a language level library for http calls coul
 var promiseResponses = nil;
 
 for(var i = 0; i < 10; i = i + 1) {
-    var promiseResponse = asyncNet("localhost", 2000, listN(requestList, i));
-    promiseResponses = prepend(promiseResponse, promiseResponses);
+    var promiseAddress = asyncNet("localhost", 2000, listN(requestList, i));
+    promiseResponses = prepend(promiseAddress, promiseResponses);
 }
 
 map(PromiseResolve, promiseResponses);
