@@ -26,8 +26,13 @@ The network call is a TCP write, so a language level library for http calls coul
 
 ## Async Network call:
 ```javascript
-var networkResponse = asyncNet("localhost", 2000, "Test");
-PromiseResolve(networkResponse);
+var promiseResponses = nil;
+for(var i = 0; i < 10; i = i + 1) {
+    var promiseResponse = asyncNet("localhost", 2000, listN(requestList, i));
+    promiseResponses = prepend(promiseResponse, promiseResponses);
+}
+
+map(PromiseResolve, promiseResponses);
 ```
 A very naive implementation of promises by using an eventDict to store threaded operation results,
 which can then be retrieved by awaiting for the promise to resolve.
