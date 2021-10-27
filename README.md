@@ -1,4 +1,4 @@
-# LaetLang
+# LaetLang 💻
 
 LaetLang is an interpreted C style language built by following along Robert Nystrom's book Crafting Interpreters.
 This is a toy language that was meant as a learning exercise, please do not use it for any projects.
