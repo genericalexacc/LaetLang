@@ -22,9 +22,16 @@ fileln("./out.txt", "Hello World.");
 var networkResponse = net("localhost", 2000, "TEST");
 print "Server responded with: " + networkResponse;
 ```
-
 The network call is a TCP write, so a language level library for http calls could be made.
 
+## Async Network call:
+```javascript
+var networkResponse = asyncNet("localhost", 2000, "Test");
+PromiseResolve(networkResponse);
+```
+A very naive implementation of promises by using an eventDict to store threaded operation results,
+which can then be retrieved by awaiting for the promise to resolve.
+This means you can do multiple network requests at the same time, and then await for the results.
 
 ------------------------------------
 
