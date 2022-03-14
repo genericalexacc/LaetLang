@@ -56,13 +56,11 @@ fun fib(n) {
 fun mod1(a, m, i) {
     if (m * i == a) {
         return 0;
-    } else {
-        if (m * i < a) {
-            return mod1(a, m, i+1);
-        } else {
-            return a - m * (i - 1);
-        }
     }
+    if (m * i < a) {
+        return mod1(a, m, i+1);
+    }
+    return a - m * (i - 1);
 }
 
 fun mod(a, b) {
